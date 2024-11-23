@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css"
+        integrity="sha512-Kc323vGBEqzTmouAECnVceyQqyqdsSiqLQISBL29aUW4U/M7pSPA/gEUZQqv1cwx4OnYxTxve5UMg5GT6L4JJg=="
+        crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <link rel="stylesheet" href="sytle.css">
+    <title>Media Player</title>
+</head>
+
+<body>
+    <div id="bg-container">
+        <video id="bg-video" loop muted>
+            <source src="background.mp4" type="video/mp4">
+        </video>
+    </div>
+    <div id="changeBtns">
+        <h1>Player background</h1>
+        <button id="bgCh1" class="cBtns">B1</button>
+        <button id="bgCh2" class="cBtns">B2</button>
+        <button id="bgCh3" class="cBtns">B3</button>
+        <h1>Background video</h1>
+        <button id="vidCh1" class="cBtns">V1</button>
+        <button id="vidCh2" class="cBtns">V2</button>
+        <button id="vidCh3" class="cBtns">V3</button>
+        <h1>Volume</h1>
+        <input id="Volume" min="0" max="100" type="range">
+    </div>
+    <div id="cont">
+        <img src="./pics/p1.jpg" alt="">
+        <div id="imgBck"></div>
+        <audio id="s1"><source src="./songs/tu h kahan.mp3" type="audio/mpeg"></audio>
+        <audio id="s2"><source src="./songs/Ajj Din Chadheya Love Aaj Kal 320 Kbps.mp3" type="audio/mpeg"></audio>
+        <audio id="s3"><source src="./songs/Pal-Arijit-Singh-Shreya-Ghoshal.mp3" type="audio/mpeg"></audio>
+        <audio id="s4"><source src="./songs/Tere Liye Prince 320 Kbps.mp3" type="audio/mpeg"></audio>
+        <audio id="s5"><source src="./songs/Tujhe Bhula Diya Phir Anjaana Anjaani 320 Kbps.mp3" type="audio/mpeg"></audio>
+        <input type="range" id="progress" value="0">
+        <div id="buttons">
+            <button onclick="previous()"><i class="fa-solid fa-backward" id="PrBtn"></i></button>
+            <button onclick="playPause()"><i class="fa-solid fa-play" id="PBtn"></i></button>
+            <button onclick="next()"><i class="fa-solid fa-forward" id="NxBtn"></i></button>
+        </div>
+    </div>
+    <script>
+        let cont = document.getElementById("cont");
+        let progress = document.getElementById("progress");
+        let pBtn = document.getElementById("PBtn");
+        let prBtn = document.getElementById("PrBtn");
+        let nxBtn = document.getElementById("NxBtn");
+        let vid = document.getElementById("bg-video");
+        let bgCh1 = document.getElementById("bgCh1");
+        let bgCh2 = document.getElementById("bgCh2");
+        let bgCh3 = document.getElementById("bgCh3");
+        let vidCh1 = document.getElementById("vidCh1");
+        let vidCh2 = document.getElementById("vidCh2");
+        let vidCh3 = document.getElementById("vidCh3");
+        let vol = document.getElementById("Volume");
+
+        const pic = document.getElementsByTagName("img")[0];
+
+        const songs = Array.from(document.getElementsByTagName("audio"));
+
+        const images = ["./pics/p1.jpg","./pics/p2.jpg","./pics/p3.jpg","./pics/p4.jpg","./pics/p5.jpg"];
+
+        const backgroundVids=["background.mp4","background2.mp4","background3.mp4"];
+
+        bgCh1.addEventListener("click",()=>{
+            cont.style.backgroundColor="rgba(255, 255, 255, 0.73)";
+            cont.style.backgroundImage = "none";
+        })
+        bgCh2.addEventListener("click",()=>{
+            cont.style.backgroundColor="none";
+        })
+        bgCh3.addEventListener("click",()=>{
+            cont.style.backgroundColor="none";
+        })
+
+        vidCh1.addEventListener("click",()=>{
+            vid.src = backgroundVids[0];
+            checkVid();
+        })
+        vidCh2.addEventListener("click",()=>{
+            vid.src = backgroundVids[1];
+            checkVid();
+        })
+        vidCh3.addEventListener("click",()=>{
+            vid.src = backgroundVids[2];
+            checkVid();
+        })
+
+        
+        
+        vid.playbackRate = 0.8;
+        
+        let itemNo = 0;
+        
+        pic.style.animationPlayState = 'paused';
+        
+        songs.forEach((song, index) => {
+            song.addEventListener("loadedmetadata", () => {
+                if (index === itemNo) {
+                    progress.max = song.duration;
+                }
+            });
+        });
+        
+        function checkVid(){
+            if (pBtn.classList.contains("fa-play")) {
+                vid.pause();
+            }
+            else{
+                vid.play();
+            }
+        }
+
+        function playPause() {
+            const currentSong = songs[itemNo];
+            vol.addEventListener("input", () => {
+                // currentSong.volume = vol.value / 100; 
+            });
+            if (pBtn.classList.contains("fa-play")) {
+                currentSong.play();
+                pBtn.classList.remove("fa-play");
+                pBtn.classList.add("fa-pause");
+                pic.style.animationPlayState = 'running';
+            }
+            else{
+                currentSong.pause();
+                pBtn.classList.remove("fa-pause");
+                pBtn.classList.add("fa-play");
+                pic.style.animationPlayState = 'paused';
+                vid.currentTime = 0;
+            }
+            checkVid();
+        }
+        
+        function next() {
+            vid.currentTime = 0;
+            songs[itemNo].pause();
+            songs[itemNo].currentTime = 0;
+            itemNo = (itemNo + 1) % songs.length;
+            pic.src = images[itemNo];
+            progress.value = 0;
+            pBtn.classList.add("fa-play");
+            playPause();
+        }
+        
+        function previous() {
+            vid.currentTime = 0;
+            songs[itemNo].pause();
+            songs[itemNo].currentTime = 0;
+            itemNo = (itemNo - 1 + songs.length) % songs.length;
+            pic.src = images[itemNo];
+            progress.value = 0;
+            pBtn.classList.add("fa-play");
+            playPause();
+        }
+        
+        setInterval(() => {
+            const currentSong = songs[itemNo];
+            if (!isNaN(currentSong.duration)) {
+                progress.value = currentSong.currentTime;
+                progress.max = currentSong.duration;
+            }
+        }, 300);
+        
+        
+        progress.addEventListener("input", () => {
+            songs[itemNo].currentTime = progress.value;
+        });
+        
+        document.addEventListener("keyup", (event) => {
+            if (event.key === "ArrowLeft") previous();
+            if (event.key === "ArrowRight") next();
+            if (event.key === " ") playPause();
+            if (event.key === "j") cont.style.backgroundColor="rgba(255, 255, 255, 0.73)";
+            if (event.key === "k") cont.style.backgroundColor="rgba(2, 62, 138, 0.73)";
+            if (event.key === "l") cont.style.backgroundColor="rgba(191, 6, 3, 0.73)";
+            if (event.key === "i") {
+                vid.src = backgroundVids[0];
+                checkVid();
+            }
+            if (event.key === "o") {
+                vid.src = backgroundVids[1];
+                checkVid();
+            }
+            if (event.key === "p") {
+                vid.src = backgroundVids[2];
+                checkVid();
+            }
+        });
+        document.addEventListener("keydown", (event) => {
+            const currentSong = songs[itemNo];
+            let volumeStep = 0.05; // Adjust the volume step as needed
+            currentSong.volume = vol.value / 100; 
+            
+            if (event.key === "ArrowUp") {
+                // Increase volume
+                currentSong.volume = Math.min(1, currentSong.volume + volumeStep); // Ensure volume doesn't exceed 1
+                vol.value = currentSong.volume * 100; 
+            } else if (event.key === "ArrowDown") {
+                // Decrease volume
+                currentSong.volume = Math.max(0, currentSong.volume - volumeStep); // Ensure volume doesn't go below 0
+                vol.value = currentSong.volume * 100;
+            }
+        });
+
+    </script>
+</body>
+
+</html>
